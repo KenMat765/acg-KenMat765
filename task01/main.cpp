@@ -7,6 +7,10 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846264338327950288
+#endif
+
 /**
  * @brief compute the area of a triangle
  * @return area
@@ -65,6 +69,10 @@ void draw_polygon(
         float p1x = polygon_xy[i1_vtx * 2 + 0] - x;
         float p1y = polygon_xy[i1_vtx * 2 + 1] - y;
         // write a few lines of code to compute winding number (hint: use atan2)
+        float cos = (p0x*p1x + p0y*p1y) / (sqrt(p0x*p0x+p0y*p0y)*sqrt(p1x*p1x+p1y*p1y));
+        float sin = (p0y*p1x - p0x*p1y) / (sqrt(p0x*p0x+p0y*p0y)*sqrt(p1x*p1x+p1y*p1y));
+        float theta = atan2(sin, cos);
+        winding_number += theta / (2*M_PI);
       }
       const int int_winding_number = int(std::round(winding_number));
       if (int_winding_number == 1 ) { // if (x,y) is inside the polygon
@@ -91,6 +99,54 @@ void dda_line(
   auto dx = x1 - x0;
   auto dy = y1 - y0;
   // write some code below to paint pixel on the line with color `brightness`
+  auto m = dy / dx;
+  if(abs(m) < 1)
+  {
+    if(dx > 0)
+    {
+      unsigned int idx = std::floor(x1) - std::floor(x0) + 1;
+      for (unsigned int i = 0; i < idx; ++i)
+      {
+        unsigned int ix = std::floor(x0 + i);
+        unsigned int iy = std::floor(y0 + m*i);
+        img_data[iy*width + ix] = brightness;
+      }
+    }
+    else
+    {
+      unsigned int idx = std::floor(x0) - std::floor(x1) + 1;
+      for (unsigned int i = 0; i < idx; ++i)
+      {
+        unsigned int ix = std::floor(x1 + i);
+        unsigned int iy = std::floor(y1 + m*i);
+        img_data[iy*width + ix] = brightness;
+      }
+    }
+  }
+  else
+  {
+    m = dx / dy;
+    if(dy > 0)
+    {
+      unsigned int idy = std::floor(y1) - std::floor(y0) + 1;
+      for (unsigned int i = 0; i < idy; ++i)
+      {
+        unsigned int ix = std::floor(x0 + m*i);
+        unsigned int iy = std::floor(y0 + i);
+        img_data[iy*width + ix] = brightness;
+      }
+    }
+    else
+    {
+      unsigned int idy = std::floor(y0) - std::floor(y1) + 1;
+      for (unsigned int i = 0; i < idy; ++i)
+      {
+        unsigned int ix = std::floor(x1 + m*i);
+        unsigned int iy = std::floor(y1 + i);
+        img_data[iy*width + ix] = brightness;
+      }
+    }
+  }
 }
 
 int main() {
