@@ -65,8 +65,44 @@ int number_of_intersection_ray_against_quadratic_bezier(
     const Eigen::Vector2f &pc,
     const Eigen::Vector2f &pe) {
   // comment out below to do the assignment
-  return number_of_intersection_ray_against_edge(org, dir, ps, pe);
+  // return number_of_intersection_ray_against_edge(org, dir, ps, pe);
   // write some code below to find the intersection between ray and the quadratic
+  auto ax = (ps(0)-2*pc(0)+pe(0))/dir(0);
+  auto bx = (pc(0)-ps(0))/dir(0);
+  auto cx = (ps(0)-org(0))/dir(0);
+  auto ay = (ps(1)-2*pc(1)+pe(1))/dir(1);
+  auto by = (pc(1)-ps(1))/dir(1);
+  auto cy = (ps(1)-org(1))/dir(1);
+  auto ax_y = ax - ay;
+  auto bx_y = bx - by;
+  auto cx_y = cx - cy;
+  auto t1 = (-bx_y + std::sqrt(bx_y*bx_y - ax_y*cx_y)) / (ax_y);
+  auto t2 = (-bx_y - std::sqrt(bx_y*bx_y - ax_y*cx_y)) / (ax_y);
+  if((t1 <= 0 || 1 <= t1) && (t2 <= 0 || 1 <= t2))
+  {
+    return 0;
+  }
+  else
+  {
+    auto count = 0;
+    if(0 < t1 && t1 < 1)
+    {
+      auto A_t1 = ax*t1*t1 + 2*bx*t1 + cx;
+      if(A_t1 > 0)
+      {
+        count ++;
+      }
+    }
+    if(0 < t2 && t2 < 1)
+    {
+      auto A_t2 = ax*t2*t2 + 2*bx*t2 + cx;
+      if(A_t2 > 0)
+      {
+        count ++;
+      }
+    }
+    return count;
+  }
 }
 
 int main() {
