@@ -68,29 +68,22 @@ void draw_3d_triangle_with_texture(
       // `bc` gives the barycentric coordinate **on the screen** and it is distorted.
       // Compute the barycentric coordinate ***on the 3d triangle** below that gives the correct texture mapping.
       // (Hint: formulate a linear system with 4x4 coefficient matrix and solve it to get the barycentric coordinate)
-      // Eigen::Matrix4f coeff;
-      // Eigen::Vector4f rhs;
-
-      // float f = 2.0f;
-      // Eigen::Matrix3f H;
-      // H(0,0)=f; H(0,1)=0; H(0,2)=0;
-      // H(1,0)=0; H(1,1)=f; H(1,2)=0;
-      // H(2,0)=0; H(2,1)=0; H(2,2)=1;
-      // Eigen::Vector3f Ha = H * Eigen::Vector3f(q0(0), q0(1), q0(2));
-      // Eigen::Vector3f Hb = H * Eigen::Vector3f(q1(0), q1(1), q1(2));
-      // Eigen::Vector3f Hc = H * Eigen::Vector3f(q2(0), q2(1), q2(2));
-      // Eigen::Matrix3f A;
-      // A(0,0)=Ha(0); A(0,1)=Hb(0); A(0,2)=Hc(0);
-      // A(1,0)=Ha(1); A(1,1)=Hb(1); A(1,2)=Hc(1);
-      // A(2,0)=1;     A(2,1)=1;     A(2,2)=1;    
-      // bc = A.inverse() * Eigen::Vector3f(s(0), s(1), 1);
-
-      float f = -2.0f;
-      Eigen::Matrix3f A;
-      A(0,0)=f*q0(0)-s(0)*q0(2); A(0,1)=f*q1(0)-s(0)*q1(2); A(0,2)=f*q2(0)-s(0)*q2(2);
-      A(1,0)=f*q0(1)-s(1)*q0(2); A(1,1)=f*q1(1)-s(1)*q1(2); A(1,2)=f*q2(1)-s(1)*q2(2);
-      A(2,0)=1; A(2,1)=1; A(2,2)=1;
-      bc = A.inverse() * Eigen::Vector3f(0.f,0.f,1.f);
+      float f = 1.0f;
+      Eigen::Matrix4f H;
+      H(0,0)=f; H(0,1)=0; H(0,2)=0; H(0,3)=0;
+      H(1,0)=0; H(1,1)=f; H(1,2)=0; H(1,3)=0;
+      H(2,0)=0; H(2,1)=0; H(2,2)=f; H(2,3)=0;
+      H(3,0)=0; H(3,1)=0; H(3,2)=0; H(3,3)=1;
+      Eigen::Vector4f Ha = H * q0;
+      Eigen::Vector4f Hb = H * q1;
+      Eigen::Vector4f Hc = H * q2;
+      Eigen::Matrix4f coeff;
+      coeff(0,0)=Ha(0); coeff(0,1)=Hb(0); coeff(0,2)=Hc(0); coeff(0,3)=-s(0);
+      coeff(1,0)=Ha(1); coeff(1,1)=Hb(1); coeff(1,2)=Hc(1); coeff(1,3)=-s(1);
+      coeff(2,0)=Ha(3); coeff(2,1)=Hb(3); coeff(2,2)=Hc(3); coeff(2,3)=-1;
+      coeff(3,0)=1; coeff(3,1)=1; coeff(3,2)=1; coeff(3,3)=0;
+      Eigen::Vector4f rhs = coeff.inverse()*Eigen::Vector4f(0,0,0,1);
+      bc = Eigen::Vector3f(rhs(0), rhs(1), rhs(2));
 
       // do not change below
       auto uv = uv0 * bc[0] + uv1 * bc[1] + uv2 * bc[2]; // uv coordinate of the pixel
