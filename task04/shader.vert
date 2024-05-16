@@ -27,6 +27,12 @@ void main()
         //x0 = ???
         //y0 = ???
         //z0 = ???
+
+        // Distance between mirror and the point.
+        float dist = (x0-org.x)*nrm.x + (y0-org.y)*nrm.y + (z0-org.z)*nrm.z;
+        x0 = x0 - 2 * dist * nrm.x;
+        y0 = y0 - 2 * dist * nrm.y;
+        z0 = z0 - 2 * dist * nrm.z + 0.5;
     }
     // do not edit below
 
