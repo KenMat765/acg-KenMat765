@@ -139,6 +139,18 @@ class HelloWorld(mglw.WindowConfig):
         # you may use `spsolve` to solve the liner system
         # spsolve: https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.spsolve.html#scipy.sparse.linalg.spsolve
 
+        # task09 #################################################################################
+        # Problem2
+        # A = self.matrix_fix + self.matrix_laplace
+        # b = self.matrix_fix.dot(self.vtx2xyz_def) + self.matrix_laplace.dot(self.vtx2xyz_ini)
+        # self.vtx2xyz_def[:] = spsolve(A, b);
+
+        # Problem3
+        L_sqr = self.matrix_laplace.dot(self.matrix_laplace)
+        A = self.matrix_fix + L_sqr
+        b = self.matrix_fix.dot(self.vtx2xyz_def) + L_sqr.dot(self.vtx2xyz_ini)
+        self.vtx2xyz_def[:] = spsolve(A, b);
+        # task09 #################################################################################
 
         # do not edit beyond here
         # above: deformation
